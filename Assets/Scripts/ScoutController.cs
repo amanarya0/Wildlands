@@ -218,8 +218,10 @@ public class ScoutController : MonoBehaviour
         Debug.Log("testing object: climbable? " + otherObject.GetComponent<IClimbable>());
 
         // handle climbable objects
-        if ( otherObject.GetComponent<IClimbable>() != null )
+        if ( otherObject.GetComponent<IClimbable>() != null)
             availableForClimb = otherObject;
+        if (otherObject.GetComponentInParent<IClimbable>() != null)
+            availableForClimb = GetParent(otherObject);
     }
 
     void OnTriggerExit2D(Collider2D otherCollider)
@@ -228,11 +230,12 @@ public class ScoutController : MonoBehaviour
         
         // if the colliding object was available for climb or the player was climbing on it,
         // remove that reference
-        if(otherObject == availableForClimb)
+        if(otherObject == availableForClimb || GetParent(otherObject) == availableForClimb)
         {
             availableForClimb = null;
         }
-        if (otherObject == climbingOnThis)
+
+        if (otherObject == climbingOnThis || GetParent(otherObject) == climbingOnThis)
         {
             StopClimbing();
         }
@@ -248,5 +251,12 @@ public class ScoutController : MonoBehaviour
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+    }
+
+
+    //helper method
+    public GameObject GetParent(GameObject obj)
+    {
+        return obj.transform.parent.gameObject;
     }
 }
