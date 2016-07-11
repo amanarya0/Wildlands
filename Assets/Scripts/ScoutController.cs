@@ -89,10 +89,10 @@ public class ScoutController : MonoBehaviour
         {
             if (colliders[i].gameObject != gameObject)
             {
-                float colliderHeight = Helper.GetRealPos(colliders[i]).y;
-                float feetHeight = m_GroundCheck.position.y;
+                //float colliderHeight = Helper.GetRealPos(colliders[i]).y;
+                //float feetHeight = m_GroundCheck.position.y;
 
-                if (feetHeight >= colliderHeight) // make sure the character is ABOVE the collider
+                //if (feetHeight >= colliderHeight) // make sure the character is ABOVE the collider
                     m_Grounded = true;
             }
         }
@@ -172,7 +172,9 @@ public class ScoutController : MonoBehaviour
 
     private void Climb(float moveHor, float moveVer, bool crouch, bool jump)
     {
-        m_Rigidbody2D.velocity = new Vector2(moveHor * m_climbSpeed, moveVer * m_climbSpeed);
+        Debug.Log("Climbing");
+        float speedMultiplier = climbingOnThis.GetComponent<IClimbable>().climbSpeedMultiplier * m_climbSpeed;
+        m_Rigidbody2D.velocity = new Vector2(moveHor , moveVer ) * speedMultiplier;
 
         if (moveVer < 0 && m_Grounded)
         { // Stop climbing if you're at the floor and press down
@@ -229,7 +231,7 @@ public class ScoutController : MonoBehaviour
         GameObject otherObject = otherCollider.gameObject;
         // if the colliding object was available for climb or the player was climbing on it,
         // remove that reference
-        if ( ( climbingOnThis ) // make sure reference is not null
+        if ( ( availableForClimb ) // make sure reference is not null
           && ( otherObject == availableForClimb || Helper.GetParent(otherObject) == availableForClimb )
            )
         {

@@ -77,11 +77,11 @@
     <Compile Include="Assets\Game Jam Menu Template\Scripts\SetAudioLevels.cs" />
     <Compile Include="Assets\Game Jam Menu Template\Scripts\ShowPanels.cs" />
     <Compile Include="Assets\Game Jam Menu Template\Scripts\StartOptions.cs" />
-    <Compile Include="Assets\OneSidedPlatform.cs" />
     <Compile Include="Assets\Scripts\ClimbableTree.cs" />
     <Compile Include="Assets\Scripts\Helper.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IClimbable.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IInteractible.cs" />
+    <Compile Include="Assets\Scripts\OneSidedPlatform.cs" />
     <Compile Include="Assets\Scripts\ScoutController.cs" />
     <Compile Include="Assets\Scripts\ScoutUserControl.cs" />
     <Compile Include="Assets\Scripts\TEST.cs" />
