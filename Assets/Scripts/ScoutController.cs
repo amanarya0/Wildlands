@@ -67,8 +67,6 @@ public class ScoutController : MonoBehaviour
         // Set the vertical animation
         m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
-        Debug.Log("Groundcheck pos: " + m_GroundCheck.position.ToString());
-
         // debugging
         //if (availableForClimb)
         //    Debug.Log("Available for climb: " + availableForClimb);
@@ -201,6 +199,7 @@ public class ScoutController : MonoBehaviour
 
     private void StopClimbing()
     {
+        Debug.Log("STOP CLIMBING METHOD CALLED");
         m_Rigidbody2D.gravityScale = m_gravityScaleDefault;
         m_Anim.SetBool("Climb", false);
         climbingOnThis.GetComponent<IClimbable>().OnDeactivate(gameObject);
@@ -217,27 +216,29 @@ public class ScoutController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D otherCollider)
     {
         GameObject otherObject = otherCollider.gameObject;
-        Debug.Log("testing object: climbable? " + otherObject.GetComponent<IClimbable>());
 
         // handle climbable objects
         if (otherObject.GetComponent<IClimbable>() != null)
             availableForClimb = otherObject;
-        if (otherObject.GetComponentInParent<IClimbable>() != null)
+        if (Helper.GetParent(otherObject) != null && otherObject.GetComponentInParent<IClimbable>() != null)
             availableForClimb = Helper.GetParent(otherObject);
     }
 
     void OnTriggerExit2D(Collider2D otherCollider)
     {
         GameObject otherObject = otherCollider.gameObject;
-
         // if the colliding object was available for climb or the player was climbing on it,
         // remove that reference
-        if (otherObject == availableForClimb || Helper.GetParent(otherObject) == availableForClimb)
+        if ( ( climbingOnThis ) // make sure reference is not null
+          && ( otherObject == availableForClimb || Helper.GetParent(otherObject) == availableForClimb )
+           )
         {
             availableForClimb = null;
         }
 
-        if (otherObject == climbingOnThis || Helper.GetParent(otherObject) == climbingOnThis)
+        if ( ( climbingOnThis ) // make sure reference is not null
+          && ( otherObject == climbingOnThis || Helper.GetParent(otherObject) == climbingOnThis)
+           )
         {
             StopClimbing();
         }

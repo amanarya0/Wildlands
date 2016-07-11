@@ -6,7 +6,11 @@ public static class Helper
     // a static helper class for common methods and shortcuts
     public static GameObject GetParent(GameObject obj)
     {
-        return obj.transform.parent.gameObject;
+        Transform parentTransform = obj.transform.parent;
+        if (parentTransform == null)
+            return null;
+
+        return parentTransform.gameObject;
     }
 
 
