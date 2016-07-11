@@ -1,0 +1,13 @@
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\Assembly-CSharp-firstpass.pdb
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEditor.dll
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEngine.dll
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEngine.Networking.dll
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEngine.UI.dll
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEngine.xml
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEngine.UI.xml
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEngine.Networking.xml
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_bin\Debug\UnityEditor.xml
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_obj\Debug\Wildlands (MFGJ).CSharp.Plugins.csprojResolveAssemblyReference.cache
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_obj\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\Jorro\Desktop\Unity Projects\Wildlands (MFGJ)\Temp\UnityVS_obj\Debug\Assembly-CSharp-firstpass.pdb

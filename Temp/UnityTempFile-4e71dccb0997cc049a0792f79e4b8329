@@ -89,6 +89,7 @@
 "Assets/Game Jam Menu Template/Scripts/ShowPanels.cs"
 "Assets/Game Jam Menu Template/Scripts/StartOptions.cs"
 Assets/Scripts/ClimbableTree.cs
+Assets/Scripts/DisableColliderOnTrigger.cs
 Assets/Scripts/Interfaces/IClimbable.cs
 Assets/Scripts/Interfaces/IInteractible.cs
 Assets/Scripts/ScoutController.cs

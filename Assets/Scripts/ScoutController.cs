@@ -16,11 +16,12 @@ public class ScoutController : MonoBehaviour
     [SerializeField]
     private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
 
-    private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
+    private Transform m_GroundCheck; // A position marking where to check if the player is grounded.
     const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
     private bool m_Grounded;            // Whether or not the player is grounded.
-    private Transform m_CeilingCheck;   // A position marking where to check for ceilings
+    private Transform m_CeilingCheck; // A position marking where to check for ceilings
     const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
+
     private Animator m_Anim;            // Reference to the player's animator component.
     private Rigidbody2D m_Rigidbody2D;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
@@ -46,7 +47,7 @@ public class ScoutController : MonoBehaviour
     //
     ////
     //
-
+    
 
     private void Awake()
     {
@@ -62,23 +63,11 @@ public class ScoutController : MonoBehaviour
 
     private void FixedUpdate()
     {
-
-        m_Grounded = false;
-
-        // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-        // This can be done using layers instead but Sample Assets will not overwrite your project settings.
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            if (colliders[i].gameObject != gameObject)
-                m_Grounded = true;
-        }
-        m_Anim.SetBool("Ground", m_Grounded);
-
+        GroundCheck();
         // Set the vertical animation
         m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
-
+        Debug.Log("Groundcheck pos: " + m_GroundCheck.position.ToString());
 
         // debugging
         //if (availableForClimb)
@@ -89,7 +78,27 @@ public class ScoutController : MonoBehaviour
         //    Debug.Log("climbing on: " + climbingOnThis);
         //else 
         //    Debug.Log("climbing on: " + "NONE");
+    }
 
+    public void GroundCheck()
+    {
+        m_Grounded = false;
+
+        // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
+        // This can be done using layers instead but Sample Assets will not overwrite your project settings.
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            if (colliders[i].gameObject != gameObject)
+            {
+                float colliderHeight = Helper.GetRealPos(colliders[i]).y;
+                float feetHeight = m_GroundCheck.position.y;
+
+                if (feetHeight >= colliderHeight) // make sure the character is ABOVE the collider
+                    m_Grounded = true;
+            }
+        }
+        m_Anim.SetBool("Ground", m_Grounded);
     }
 
     private void Update()
@@ -120,7 +129,7 @@ public class ScoutController : MonoBehaviour
         m_Anim.SetBool("Crouch", crouch);
 
 
-        if(availableForClimb && moveVer > 0 && !climbDisabled)
+        if (availableForClimb && moveVer > 0 && !climbDisabled)
         { // if there's an object you can climb and user presses up (and climb is enabled)
             StartClimbing(availableForClimb);
         }
@@ -162,19 +171,12 @@ public class ScoutController : MonoBehaviour
         }
     }
 
-    void Jump()
-    {
-        // Add a vertical force to the player.
-        m_Grounded = false;
-        m_Anim.SetBool("Ground", false);
-        m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
-    }
 
     private void Climb(float moveHor, float moveVer, bool crouch, bool jump)
     {
         m_Rigidbody2D.velocity = new Vector2(moveHor * m_climbSpeed, moveVer * m_climbSpeed);
 
-        if ( moveVer < 0 && m_Grounded)
+        if (moveVer < 0 && m_Grounded)
         { // Stop climbing if you're at the floor and press down
             StopClimbing();
         }
@@ -218,29 +220,36 @@ public class ScoutController : MonoBehaviour
         Debug.Log("testing object: climbable? " + otherObject.GetComponent<IClimbable>());
 
         // handle climbable objects
-        if ( otherObject.GetComponent<IClimbable>() != null)
+        if (otherObject.GetComponent<IClimbable>() != null)
             availableForClimb = otherObject;
         if (otherObject.GetComponentInParent<IClimbable>() != null)
-            availableForClimb = GetParent(otherObject);
+            availableForClimb = Helper.GetParent(otherObject);
     }
 
     void OnTriggerExit2D(Collider2D otherCollider)
     {
         GameObject otherObject = otherCollider.gameObject;
-        
+
         // if the colliding object was available for climb or the player was climbing on it,
         // remove that reference
-        if(otherObject == availableForClimb || GetParent(otherObject) == availableForClimb)
+        if (otherObject == availableForClimb || Helper.GetParent(otherObject) == availableForClimb)
         {
             availableForClimb = null;
         }
 
-        if (otherObject == climbingOnThis || GetParent(otherObject) == climbingOnThis)
+        if (otherObject == climbingOnThis || Helper.GetParent(otherObject) == climbingOnThis)
         {
             StopClimbing();
         }
     }
 
+    void Jump()
+    {
+        // Add a vertical force to the player.
+        m_Grounded = false;
+        m_Anim.SetBool("Ground", false);
+        m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+    }
 
     private void Flip()
     {
@@ -254,9 +263,15 @@ public class ScoutController : MonoBehaviour
     }
 
 
-    //helper method
-    public GameObject GetParent(GameObject obj)
+    //public pethods
+    public Transform getGroundCheck()
     {
-        return obj.transform.parent.gameObject;
+        return m_GroundCheck;
     }
+    public Transform getCeilingCheck()
+    {
+        return m_CeilingCheck;
+    }
+
 }
+
