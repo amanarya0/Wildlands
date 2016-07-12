@@ -32,9 +32,11 @@ public class ScoutController : MonoBehaviour
     //// CLIMBING
     //
     // null if not climbing on, otherwise has a reference to the object currently climbing on
-    private GameObject climbingOnThis;
+    [HideInInspector]
+    public GameObject climbingOnThis;
     // will have a reference to a climbable object if you're in the vicinity of one. null otherwise.
-    private GameObject availableForClimb;
+    [HideInInspector]
+    public GameObject availableForClimb;
     [SerializeField]
     private float m_climbSpeed;
     private bool climbDisabled = false; // disable climbing for a short period after jumping
@@ -43,6 +45,8 @@ public class ScoutController : MonoBehaviour
     [Tooltip("after jumping from a climbable surface climbing will be disabled for this short time")]
     private float climbDisableTime = 0.2f;
     private float climbDisableCounter = 0;
+
+    private IClimbable treeScript;
     //
     //
     ////
@@ -67,15 +71,15 @@ public class ScoutController : MonoBehaviour
         // Set the vertical animation
         m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
-        // debugging
-        //if (availableForClimb)
-        //    Debug.Log("Available for climb: " + availableForClimb);
-        //else
-        //    Debug.Log("Available for climb: " + "NONE");
-        //if (climbingOnThis)
-        //    Debug.Log("climbing on: " + climbingOnThis);
-        //else 
-        //    Debug.Log("climbing on: " + "NONE");
+        //debugging
+        if (availableForClimb)
+            Debug.Log("Available for climb: " + availableForClimb);
+        else
+            Debug.Log("Available for climb: " + "NONE");
+        if (climbingOnThis)
+            Debug.Log("climbing on: " + climbingOnThis);
+        else
+            Debug.Log("climbing on: " + "NONE");
     }
 
     public void GroundCheck()
@@ -89,11 +93,15 @@ public class ScoutController : MonoBehaviour
         {
             if (colliders[i].gameObject != gameObject)
             {
-                //float colliderHeight = Helper.GetRealPos(colliders[i]).y;
-                //float feetHeight = m_GroundCheck.position.y;
-
-                //if (feetHeight >= colliderHeight) // make sure the character is ABOVE the collider
+                float colliderHeight = Helper.GetRealPos(colliders[i]).y;
+                float feetHeight = m_GroundCheck.position.y;
+                
+                // make sure the character is ABOVE the collider if it's not rotated
+                // (don't perform this check for rotated objects, since it causes unexpected behavior)
+                if (colliders[i].transform.rotation != Quaternion.identity 
+                  || feetHeight >= colliderHeight) 
                     m_Grounded = true;
+
             }
         }
         m_Anim.SetBool("Ground", m_Grounded);
@@ -173,8 +181,11 @@ public class ScoutController : MonoBehaviour
     private void Climb(float moveHor, float moveVer, bool crouch, bool jump)
     {
         Debug.Log("Climbing");
-        float speedMultiplier = climbingOnThis.GetComponent<IClimbable>().climbSpeedMultiplier * m_climbSpeed;
+        float speedMultiplier = treeScript.climbSpeedMultiplier * m_climbSpeed;
+
+
         m_Rigidbody2D.velocity = new Vector2(moveHor , moveVer ) * speedMultiplier;
+
 
         if (moveVer < 0 && m_Grounded)
         { // Stop climbing if you're at the floor and press down
@@ -189,23 +200,25 @@ public class ScoutController : MonoBehaviour
         }
     }
 
-    private void StartClimbing(GameObject obj)
+    public void StartClimbing(GameObject obj)
     {
         climbingOnThis = obj;
         m_Rigidbody2D.gravityScale = 0;
         m_Grounded = false;
         m_Anim.SetBool("Climb", true);
+        treeScript = climbingOnThis.GetComponent<IClimbable>();
 
-        obj.GetComponent<IClimbable>().OnActivate(gameObject);
+        treeScript.OnActivate(gameObject);
     }
-
-    private void StopClimbing()
+    
+    public void StopClimbing()
     {
         Debug.Log("STOP CLIMBING METHOD CALLED");
         m_Rigidbody2D.gravityScale = m_gravityScaleDefault;
         m_Anim.SetBool("Climb", false);
-        climbingOnThis.GetComponent<IClimbable>().OnDeactivate(gameObject);
+        treeScript.OnDeactivate(gameObject);
         climbingOnThis = null;
+        treeScript = null;
     }
 
     private void tempDisableClimb()
@@ -213,37 +226,6 @@ public class ScoutController : MonoBehaviour
         Debug.Log("tempDisableClimb() called");
         climbDisabled = true;
         climbDisableCounter = 0;
-    }
-
-    void OnTriggerEnter2D(Collider2D otherCollider)
-    {
-        GameObject otherObject = otherCollider.gameObject;
-
-        // handle climbable objects
-        if (otherObject.GetComponent<IClimbable>() != null)
-            availableForClimb = otherObject;
-        if (Helper.GetParent(otherObject) != null && otherObject.GetComponentInParent<IClimbable>() != null)
-            availableForClimb = Helper.GetParent(otherObject);
-    }
-
-    void OnTriggerExit2D(Collider2D otherCollider)
-    {
-        GameObject otherObject = otherCollider.gameObject;
-        // if the colliding object was available for climb or the player was climbing on it,
-        // remove that reference
-        if ( ( availableForClimb ) // make sure reference is not null
-          && ( otherObject == availableForClimb || Helper.GetParent(otherObject) == availableForClimb )
-           )
-        {
-            availableForClimb = null;
-        }
-
-        if ( ( climbingOnThis ) // make sure reference is not null
-          && ( otherObject == climbingOnThis || Helper.GetParent(otherObject) == climbingOnThis)
-           )
-        {
-            StopClimbing();
-        }
     }
 
     void Jump()
