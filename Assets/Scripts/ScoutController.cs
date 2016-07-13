@@ -46,7 +46,7 @@ public class ScoutController : MonoBehaviour
     private float climbDisableTime = 0.2f;
     private float climbDisableCounter = 0;
 
-    private IClimbable treeScript;
+    private ClimbableTree treeScript;
     //
     //
     ////
@@ -181,7 +181,19 @@ public class ScoutController : MonoBehaviour
     private void Climb(float moveHor, float moveVer, bool crouch, bool jump)
     {
         Debug.Log("Climbing");
-        float speedMultiplier = treeScript.climbSpeedMultiplier * m_climbSpeed;
+
+        if (jump)
+        {   // detach from tree, jump, then return control to Move()
+            Debug.Log("climb->jump");
+            StopClimbing();
+            tempDisableClimb();
+            Jump();
+            return; 
+        }
+
+        
+
+        float speedMultiplier = treeScript.climbEase * m_climbSpeed;
 
 
         m_Rigidbody2D.velocity = new Vector2(moveHor , moveVer ) * speedMultiplier;
@@ -191,13 +203,7 @@ public class ScoutController : MonoBehaviour
         { // Stop climbing if you're at the floor and press down
             StopClimbing();
         }
-        if (jump)
-        {
-            Debug.Log("climb->jump");
-            StopClimbing();
-            tempDisableClimb();
-            Jump();
-        }
+
     }
 
     public void StartClimbing(GameObject obj)
@@ -206,9 +212,7 @@ public class ScoutController : MonoBehaviour
         m_Rigidbody2D.gravityScale = 0;
         m_Grounded = false;
         m_Anim.SetBool("Climb", true);
-        treeScript = climbingOnThis.GetComponent<IClimbable>();
-
-        treeScript.OnActivate(gameObject);
+        treeScript = climbingOnThis.GetComponent<ClimbableTree>();
     }
     
     public void StopClimbing()
@@ -216,7 +220,6 @@ public class ScoutController : MonoBehaviour
         Debug.Log("STOP CLIMBING METHOD CALLED");
         m_Rigidbody2D.gravityScale = m_gravityScaleDefault;
         m_Anim.SetBool("Climb", false);
-        treeScript.OnDeactivate(gameObject);
         climbingOnThis = null;
         treeScript = null;
     }

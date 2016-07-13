@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class ClimbableTree : MonoBehaviour, IClimbable {
+public class ClimbableTree : MonoBehaviour {
     // A script for a tree that's climbable.
     // the basic script for climbable GameObjects
     [Tooltip("you can speed up or slow down the players climbing speed with this. 1 = default speed")]
@@ -11,11 +11,6 @@ public class ClimbableTree : MonoBehaviour, IClimbable {
     public float climbEase;
     [Tooltip("if true, player will not be able to leave the climbing area from the sides")]
     public bool restrictToColliderArea; // NOTE: this functionality mostly implemented in ScoutController, using right/leftBounds
-    public float climbSpeedMultiplier
-    {
-        get { return climbEase; }
-        set { climbEase = value; }
-    }
 
     private float leftBound;
     private float rightBound;
@@ -115,18 +110,5 @@ public class ClimbableTree : MonoBehaviour, IClimbable {
         }
         else
             throw new ArgumentException("getBound(string) argument must be either \"LEFT\" or \"RIGHT\"!");
-    }
-
-
-
-
-    public void OnActivate(GameObject climber)
-    {
-        return;
-    }
-
-    public void OnDeactivate(GameObject climber)
-    {
-        return;
     }
 }
